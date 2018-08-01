@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 public class NamesrvController {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.NAMESRV_LOGGER_NAME);
-
+    // 主要指定nameserver的相关配置目录属性
     private final NamesrvConfig namesrvConfig;
 
     private final NettyServerConfig nettyServerConfig;
