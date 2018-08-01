@@ -1,0 +1,3 @@
+# projects_rocketmq
+对开源版本的RocketMQ做了一些注释和功能的说明，为了方便大家阅读源码和研究RocketMQ
+
