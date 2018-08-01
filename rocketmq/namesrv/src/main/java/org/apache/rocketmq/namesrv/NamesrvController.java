@@ -37,23 +37,32 @@ import org.slf4j.LoggerFactory;
 
 public class NamesrvController {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.NAMESRV_LOGGER_NAME);
-    // 主要指定nameserver的相关配置目录属性
+    /**
+     * 主要指定nameserver的相关配置目录属性
+     */
     private final NamesrvConfig namesrvConfig;
 
     private final NettyServerConfig nettyServerConfig;
 
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryImpl(
         "NSScheduledThread"));
+    /**
+     *  读取或变更NameServer的配置属性，加载NamesrvConfig中配置的配置文件到内存
+     */
     private final KVConfigManager kvConfigManager;
+    /**
+     * 记录Broker,Topic等信息
+     */
     private final RouteInfoManager routeInfoManager;
 
     private RemotingServer remotingServer;
-
+    /**
+     * 实现ChannelEventListener接口，通道在发送异常时的回调方法（Nameserver与Broker的连接通道在关闭、通道发送异常、通道空闲时），移除已Down掉的Broker
+     */
     private BrokerHousekeepingService brokerHousekeepingService;
 
     /**
      * 应用层(NameServer)的线程池，通过应用层自己初始化传入的
-     *
      */
     private ExecutorService remotingExecutor;
 
@@ -78,9 +87,15 @@ public class NamesrvController {
 
         this.remotingServer = new NettyRemotingServer(this.nettyServerConfig, this.brokerHousekeepingService);
 
+        /**
+         * 创建一个线程容量为serverWorkerThreads的固定长度的线程池，该线程池供DefaultRequestProcessor类使用，该类实现具体的默认的请求命令处理
+         */
         this.remotingExecutor =
             Executors.newFixedThreadPool(nettyServerConfig.getServerWorkerThreads(), new ThreadFactoryImpl("RemotingExecutorThread_"));
 
+        /**
+         * 将DefaultRequestProcessor和remotingExecutor线程池绑定
+         */
         this.registerProcessor();
 
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
